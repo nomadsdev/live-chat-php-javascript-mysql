@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        .nomal{ 
+            font-family: 'Poppins', sans-serif;
+        }
+        #chat-container {
+            font-family: monospace;
+            text-align: left;
+            background-color: #1b212c;
+            color: #eee;
+            font-size: 9px;
+            padding: 5px;
+            width: 470px;
+            height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .send{
+            color: #fff;
+            background-color: #1b212c;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex justify-center pt-10">
+        <div class="bg-zinc-50 rounded-lg p-5 shadow-md">
+            <div class="flex justify-center pb-5">
+                    <h1 class="nomal text-center">
+                        Live Chat
+                    </h1>
+            </div>
+            <div id="chat-container">
+                <!-- แสดงประวัติข้อความ -->
+            </div>
+            <div class="nomal pt-5 flex gap-5">
+                <input type="text" id="name" placeholder="name" class="w-14 h-8 text-center shadow-md bg-white text-xs px-2 rounded-lg">
+                <input type="text" id="message" placeholder="message" class="w-80 h-8 text-center shadow-md bg-white text-xs rounded-lg">
+                <button onclick="sendMessage()" class="send w-12 h-8 text-center shadow-md rounded-lg"><span class="flex justify-center"><ion-icon name="navigate-outline"></ion-icon></span></button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="pt-10">
+        <h1 class="nomal text-xs text-center text-blue-500">
+            Nomads <span class="text-orange-500">Developer</span>
+        </h1>
+    </footer>
+    
+
+    <script>
+        function sendMessage() {
+            var name = document.getElementById('name').value;
+            var message = document.getElementById('message').value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'save_message.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.send('name=' + encodeURIComponent(name) + '&message=' + encodeURIComponent(message));
+
+            document.getElementById('message').value = '';
+            
+            loadChat();
+        }
+
+        function loadChat() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('chat-container').innerHTML = this.responseText;
+                    document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+                }
+            };
+            xhr.open('GET', 'get_messages.php', true);
+            xhr.send();
+        }
+
+        window.onload = function() {
+            loadChat();
+        };
+
+        setInterval(function() {
+            loadChat();
+        }, 3000);
+    </script>
+</body>
+</html>
